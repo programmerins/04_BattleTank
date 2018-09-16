@@ -8,6 +8,7 @@
 
 
 // forward declarations
+class UTankTurret;
 class UTankBarrel;
 
 // Hold barrel's properties and Elevate method
@@ -23,12 +24,16 @@ public:
 public:
 	void AimAt(FVector HitLocation, float LaunchSpeed);
 
-	FORCEINLINE void SetTurretReference(UStaticMeshComponent* TurretToSet) { Turret = TurretToSet; }
+	FORCEINLINE UTankTurret* GetTurretReference() const { return Turret; }
+
+	FORCEINLINE UTankBarrel* GetBarrelReference() const { return Barrel; }
+
+	FORCEINLINE void SetTurretReference(UTankTurret* TurretToSet) { Turret = TurretToSet; }
 
 	FORCEINLINE void SetBarrelReference(UTankBarrel* BarrelToSet) { Barrel = BarrelToSet; }
 
 private:
-	UStaticMeshComponent* Turret = nullptr;
+	UTankTurret* Turret = nullptr;
 
 	UTankBarrel* Barrel = nullptr;
 

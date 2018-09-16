@@ -9,16 +9,6 @@
 void ATankPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-
-	ATank* HasController = GetControlledTank();
-	if (!HasController)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("PlayerController no prossesing a tank."))
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("PlayerController possessing: %s"), *HasController->GetName());
-	}
 }
 
 

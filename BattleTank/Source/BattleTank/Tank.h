@@ -8,8 +8,11 @@
 
 
 // forward declaration
+class ABullet;
+class UTankTurret;
 class UTankBarrel;
-
+class UTankAimingComponent;
+class UTankMovementComponent;
 
 UCLASS()
 class BATTLETANK_API ATank : public APawn
@@ -28,18 +31,32 @@ private:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 protected:
-	class UTankAimingComponent* TankAimingComponent = nullptr;
+	UPROPERTY(BlueprintReadOnly)
+	UTankMovementComponent* TankMovementComponent = nullptr;
+
+	UTankAimingComponent* TankAimingComponent = nullptr;
+
+private:
+	const float ReloadTimeInSeconds = 3.0f;
+
+	double LastFireTime = 0.0f;
 
 public:
-	UPROPERTY(EditAnywhere, Category = Firing)
-	float LaunchSpeed = 10000000; // TODO: find sensible default value
+	UPROPERTY(EditDefaultsOnly, Category = Setup)
+	TSubclassOf<ABullet> Bullet;
+
+	UPROPERTY(EditDefaultsOnly, Category = Firing)
+	float LaunchSpeed = 4000.0f;
 
 public:
-	void AimAt(FVector HitLocation);
+	UFUNCTION(BlueprintCallable, Category = Setup)
+	void SetTurretReference(UTankTurret* TurretToSet);
 
 	UFUNCTION(BlueprintCallable, Category = Setup)
 	void SetBarrelReference(UTankBarrel* BarrelToSet);
 
-	UFUNCTION(BlueprintCallable, Category = Setup)
-	void SetTurretReference(UStaticMeshComponent* TurretToSet);
+	UFUNCTION(BlueprintCallable)
+	void Fire();
+
+	void AimAt(FVector HitLocation);
 };

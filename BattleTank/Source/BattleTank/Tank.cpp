@@ -2,6 +2,9 @@
 
 #include "Tank.h"
 #include "TankAimingComponent.h"
+#include "TankMovementComponent.h"
+#include "TankBarrel.h"
+#include "Bullet.h"
 
 // Sets default values
 ATank::ATank()
@@ -10,6 +13,7 @@ ATank::ATank()
 	PrimaryActorTick.bCanEverTick = false;
 
 	// No need to protect points as added at construction
+	TankMovementComponent = CreateDefaultSubobject<UTankMovementComponent>(FName("Movement Component"));
 	TankAimingComponent = CreateDefaultSubobject<UTankAimingComponent>(FName("Aiming Component"));
 }
 
@@ -40,7 +44,26 @@ void ATank::SetBarrelReference(UTankBarrel* BarrelToSet)
 }
 
 
-void ATank::SetTurretReference(UStaticMeshComponent* TurretToSet)
+void ATank::SetTurretReference(UTankTurret* TurretToSet)
 {
 	TankAimingComponent->SetTurretReference(TurretToSet);
+}
+
+
+void ATank::Fire()
+{
+	bool IsReloaded = (FPlatformTime::Seconds() - LastFireTime) > ReloadTimeInSeconds;
+
+	if (TankAimingComponent->GetBarrelReference() && IsReloaded)
+	{
+		// Spawn a bullet at the socket location on the barrel
+		ABullet* NewBullet = GetWorld()->SpawnActor<ABullet>(
+			Bullet, 
+			TankAimingComponent->GetBarrelReference()->GetSocketLocation(FName("Muzzle")), 
+			TankAimingComponent->GetBarrelReference()->GetSocketRotation(FName("Muzzle"))
+		);
+
+		NewBullet->LaunchBullet(LaunchSpeed);
+		LastFireTime = FPlatformTime::Seconds();
+	}
 }
