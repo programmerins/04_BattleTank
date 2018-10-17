@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright EmbraceIT Ltd.
 
 #include "TankAimingComponent.h"
 #include "TankBarrel.h"
@@ -16,39 +16,47 @@ UTankAimingComponent::UTankAimingComponent()
 }
 
 
-void UTankAimingComponent::AimAt(FVector HitLocation, float LaunchSpeed)
+void UTankAimingComponent::Init(UTankBarrel* BarrelToSet, UTankTurret* TurretToSet)
 {
-	if (Barrel)
+	Barrel = BarrelToSet;
+	Turret = TurretToSet;
+}
+
+
+void UTankAimingComponent::AimAt(FVector HitLocation)
+{
+	if (!ensure(Barrel)) { return; }
+
+	FVector OutLaunchVelocity;
+	FVector StartLocation = Barrel->GetSocketLocation(FName("Muzzle"));
+
+	bool bHaveAimSolution = UGameplayStatics::SuggestProjectileVelocity
+	(
+		this,
+		OUT OutLaunchVelocity,
+		StartLocation,
+		HitLocation,
+		LaunchSpeed,
+		false,
+		0,
+		0,
+		ESuggestProjVelocityTraceOption::DoNotTrace
+	);
+
+	if (bHaveAimSolution) /// Calculate the OutLaunchVelocity
 	{
-		FVector OutLaunchVelocity;
-		FVector StartLocation = Barrel->GetSocketLocation(FName("Muzzle"));
-
-		bool bHaveAimSolution = UGameplayStatics::SuggestProjectileVelocity
-		(
-			this,
-			OUT OutLaunchVelocity,
-			StartLocation,
-			HitLocation,
-			LaunchSpeed,
-			false,
-			0,
-			0,
-			ESuggestProjVelocityTraceOption::DoNotTrace
-		);
-
-		if (bHaveAimSolution) /// Calculate the OutLaunchVelocity
-		{
-			FVector AimDirection = OutLaunchVelocity.GetSafeNormal();
-			MoveBarrelTowards(AimDirection);
-		}
-
-		// If no solution found do nothing
+		FVector AimDirection = OutLaunchVelocity.GetSafeNormal();
+		MoveBarrelTowards(AimDirection);
 	}
+
+	// If no solution found do nothing
 }
 
 
 void UTankAimingComponent::MoveBarrelTowards(FVector AimDirection)
 {
+	if (!ensure(Barrel) || !ensure(Turret)) { return; }
+
 	// Work-out difference between current barrel rotation, and AimDirection
 	FRotator BarrelRotator	= Barrel->GetForwardVector().Rotation();
 	FRotator AimAsRotator	= AimDirection.Rotation();

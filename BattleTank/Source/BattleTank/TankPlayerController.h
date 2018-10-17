@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright EmbraceIT Ltd.
 
 #pragma once
 
@@ -6,11 +6,15 @@
 #include "GameFramework/PlayerController.h"
 #include "TankPlayerController.generated.h"
   
-class ATank;
+class UTankAimingComponent;
 
 // TODO LIST
 // TODO: 적을 정확하게 에임 시 에임 위젯이 빨갛게 되도록 구현하기
 
+
+/**
+ * Responsible for helping the player aim.
+ */
 UCLASS()
 class BATTLETANK_API ATankPlayerController final : public APlayerController
 {
@@ -21,9 +25,21 @@ private:
 
 	virtual void Tick(float DeltaTime) override;
 
-private:
-	ATank* GetControlledTank() const;
+protected:
+	UFUNCTION(BlueprintImplementableEvent, Category = "Setup")
+	void FoundAimingComponent(UTankAimingComponent* AimCompRef);
 
+private:
+	UPROPERTY(EditDefaultsOnly)
+	float CrosshairXLocation = 0.5f;
+
+	UPROPERTY(EditDefaultsOnly)
+	float CrosshairYLocation = 0.3333f;
+
+	UPROPERTY(EditDefaultsOnly)
+	float LineTraceRange = 1000000.f;
+
+private:
 	// Start the tank moving the barrel so that a shot would it where
 	// the crosshair intersects the world
 	void AimTowardsCrosshair();
@@ -34,14 +50,4 @@ private:
 	bool GetLookDirection(FVector2D ScreenLocation, FVector& LookDirection) const;
 
 	bool GetLookVectorHitLocation(FVector LookDirection, FVector& HitLocation) const;
-	
-private:
-	UPROPERTY(EditDefaultsOnly)
-	float CrosshairXLocation = 0.5f;
-
-	UPROPERTY(EditDefaultsOnly)
-	float CrosshairYLocation = 0.3333f;
-
-	UPROPERTY(EditDefaultsOnly)
-	float LineTraceRange = 1000000.f;
 };

@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright EmbraceIT Ltd.
 
 #include "TankTurret.h"
 
@@ -11,7 +11,5 @@ void UTankTurret::Rotate(float RelativeSpeed)
 	float Rotation			= RelativeRotation.Yaw + RotationChange;
 
 	// TODO 터렛 회전에 보간 먹이기
-	SetRelativeRotation(
-		FRotator(0, Rotation, 0)
-	);
+	SetRelativeRotation(FRotator(0, Rotation, 0));
 }

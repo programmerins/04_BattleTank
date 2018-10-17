@@ -1,14 +1,18 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright EmbraceIT Ltd.
 
 #include "TankPlayerController.h"
-#include "Tank.h"
-
-#include "DrawDebugHelpers.h"
+#include "TankAimingComponent.h"
+///#include "DrawDebugHelpers.h"
 
 
 void ATankPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+
+	UTankAimingComponent* AimComponent = GetPawn()->FindComponentByClass<UTankAimingComponent>();
+	if (!ensure(AimComponent)) { return; }
+
+	FoundAimingComponent(AimComponent);
 }
 
 
@@ -20,24 +24,18 @@ void ATankPlayerController::Tick(float DeltaTime)
 }
 
 
-ATank* ATankPlayerController::GetControlledTank() const
-{
-	return Cast<ATank>(GetPawn());
-}
-
-
 void ATankPlayerController::AimTowardsCrosshair()
 {
-	if (GetControlledTank())
-	{
-		FVector HitLocation = FVector::ZeroVector; /// Out parameter
+	UTankAimingComponent* AimComponent = GetPawn()->FindComponentByClass<UTankAimingComponent>();
+	FVector HitLocation = FVector::ZeroVector; /// Out parameter
 
-		if (GetSightRayHitLocation(OUT HitLocation)) /// Has "side-effect", is going to line trace
-		{
-			// TODO: Tell controlled tank to aim at this point
-			GetControlledTank()->AimAt(HitLocation);
-		}	
-	}
+	if (!ensure(AimComponent)) { return; }
+
+	if (GetSightRayHitLocation(OUT HitLocation)) /// Has "side-effect", is going to line trace
+	{
+		// TODO: Tell controlled tank to aim at this point
+		AimComponent->AimAt(HitLocation);
+	}	
 }
 
 
@@ -83,8 +81,8 @@ bool ATankPlayerController::GetLookVectorHitLocation(FVector LookDirection, FVec
 	FVector		StartLocation	= PlayerCameraManager->GetCameraLocation();
 	FVector		EndLocation		= StartLocation + (LookDirection * LineTraceRange);
 
-	/// Test a draw debug line
-	DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Red);
+	/// Test a draw debug line (TODO Áö¿ì±â)
+	///DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Red);
 
 	if (GetWorld()->LineTraceSingleByChannel(
 		OUT HitResult, 

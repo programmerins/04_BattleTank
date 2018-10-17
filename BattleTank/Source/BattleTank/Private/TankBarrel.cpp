@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright EmbraceIT Ltd.
 
 #include "TankBarrel.h"
 
@@ -10,7 +10,5 @@ void UTankBarrel::Elevate(float RelativeSpeed)
 	float RawNewElevation	= RelativeRotation.Pitch + ElevationChange;
 	float Elevation			= FMath::Clamp<float>(RawNewElevation, MinElevationDegrees, MaxElevationDegrees);
 
-	SetRelativeRotation(
-		FRotator(Elevation, 0.0f, 0.0f)
-	);
+	SetRelativeRotation(FRotator(Elevation, 0.0f, 0.0f));
 }
