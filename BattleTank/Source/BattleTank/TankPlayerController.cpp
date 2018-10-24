@@ -26,10 +26,13 @@ void ATankPlayerController::Tick(float DeltaTime)
 
 void ATankPlayerController::AimTowardsCrosshair()
 {
-	UTankAimingComponent* AimComponent = GetPawn()->FindComponentByClass<UTankAimingComponent>();
-	FVector HitLocation = FVector::ZeroVector; /// Out parameter
+	if (!GetPawn()) { return; }
 
+	UTankAimingComponent* AimComponent = GetPawn()->FindComponentByClass<UTankAimingComponent>();
 	if (!ensure(AimComponent)) { return; }
+
+	FVector HitLocation = FVector::ZeroVector; /// Out parameter
+	bool bGotHitLocation = GetSightRayHitLocation(OUT HitLocation);
 
 	if (GetSightRayHitLocation(OUT HitLocation)) /// Has "side-effect", is going to line trace
 	{
@@ -54,10 +57,7 @@ bool ATankPlayerController::GetSightRayHitLocation(FVector& HitLocation) const
 	if (GetLookDirection(ScreenLocation, OUT LookDirection))
 	{
 		// Line-trace along that LookDirection, and see what we hit (up to max range)
-		if (GetLookVectorHitLocation(LookDirection, OUT HitLocation))
-		{
-			return true;
-		}
+		return GetLookVectorHitLocation(LookDirection, OUT HitLocation);
 	}
 
 	return false;
@@ -81,13 +81,7 @@ bool ATankPlayerController::GetLookVectorHitLocation(FVector LookDirection, FVec
 	FVector		StartLocation	= PlayerCameraManager->GetCameraLocation();
 	FVector		EndLocation		= StartLocation + (LookDirection * LineTraceRange);
 
-	/// Test a draw debug line (TODO Áö¿ì±â)
-	///DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Red);
-
-	if (GetWorld()->LineTraceSingleByChannel(
-		OUT HitResult, 
-		StartLocation, EndLocation, 
-		ECollisionChannel::ECC_Visibility))
+	if (GetWorld()->LineTraceSingleByChannel(OUT HitResult, StartLocation, EndLocation, ECollisionChannel::ECC_Visibility))
 	{
 		HitLocation = HitResult.Location;
 		return true;

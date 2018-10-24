@@ -42,6 +42,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Fire();
 
+	FORCEINLINE EFiringState GetFiringState() const { return FiringState; }
+
 	void AimAt(FVector HitLocation);
 
 
@@ -54,7 +56,8 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Firing")
 	float LaunchSpeed = 4000.0f;
 
-	const float ReloadTimeInSeconds = 3.0f;
+	UPROPERTY(EditDefaultsOnly, Category = "Firing")
+	float ReloadTimeInSeconds = 3.0f;
 
 	double LastFireTime = 0.0f;
 
