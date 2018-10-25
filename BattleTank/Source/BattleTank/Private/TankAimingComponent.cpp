@@ -131,7 +131,7 @@ bool UTankAimingComponent::IsBarrelMoving() const
 }
 
 
-int UTankAimingComponent::GetRoundsLeft() const
+int32 UTankAimingComponent::GetRoundsLeft() const
 {
 	return RoundsLeft;
 }

@@ -32,11 +32,6 @@ class BATTLETANK_API UTankAimingComponent : public UActorComponent
 
 
 public:
-	UPROPERTY(EditDefaultsOnly, Category = "Setup")
-	TSubclassOf<ABullet> Bullet;
-
-
-public:
 	UFUNCTION(BlueprintCallable, Category = "State")
 	void Init(UTankBarrel* BarrelToSet, UTankTurret* TurretToSet);
 
@@ -46,7 +41,7 @@ public:
 	FORCEINLINE EFiringState GetFiringState() const { return FiringState; }
 
 	UFUNCTION(BlueprintCallable, Category = "Firing")
-	int GetRoundsLeft() const;
+	int32 GetRoundsLeft() const;
 
 	void AimAt(FVector HitLocation);
 
@@ -57,11 +52,17 @@ protected:
 
 
 private:
+	UPROPERTY(EditDefaultsOnly, Category = "Setup")
+	TSubclassOf<ABullet> Bullet;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Firing")
 	float LaunchSpeed = 4000.0f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Firing")
 	float ReloadTimeInSeconds = 3.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Firing")
+	int32 RoundsLeft = 3;
 
 	double LastFireTime = 0.0f;
 
@@ -70,8 +71,6 @@ private:
 	UTankBarrel* Barrel = nullptr;
 
 	FVector AimDirection = FVector::ZeroVector;
-
-	int RoundsLeft = 3;
 
 
 private:
