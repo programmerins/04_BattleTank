@@ -27,7 +27,11 @@ public:
 	void LaunchBullet(float Speed);
 
 private:
-	UProjectileMovementComponent* ProjectileMovement = nullptr;
+	UPROPERTY(EditDefaultsOnly, Category = "Setup")
+	float DestroyDelay = 10.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Setup")
+	float BulletDamage = 20.f;
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UStaticMeshComponent* CollisionMesh = nullptr;
@@ -38,7 +42,15 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UParticleSystemComponent* ImpactBlast = nullptr;
 
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	class URadialForceComponent* ExplosionForce = nullptr;
+
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UProjectileMovementComponent* ProjectileMovement = nullptr;
+
 private:
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+	void OnTimerExpire();
 };
