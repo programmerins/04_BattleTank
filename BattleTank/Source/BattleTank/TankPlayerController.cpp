@@ -2,12 +2,15 @@
 
 #include "TankPlayerController.h"
 #include "TankAimingComponent.h"
+#include "Tank.h"
 ///#include "DrawDebugHelpers.h"
 
 
 void ATankPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (!GetPawn()) { return;  }
 
 	UTankAimingComponent* AimComponent = GetPawn()->FindComponentByClass<UTankAimingComponent>();
 	if (!ensure(AimComponent)) { return; }
@@ -81,11 +84,33 @@ bool ATankPlayerController::GetLookVectorHitLocation(FVector LookDirection, FVec
 	FVector		StartLocation	= PlayerCameraManager->GetCameraLocation();
 	FVector		EndLocation		= StartLocation + (LookDirection * LineTraceRange);
 
-	if (GetWorld()->LineTraceSingleByChannel(OUT HitResult, StartLocation, EndLocation, ECollisionChannel::ECC_Visibility))
+	if (GetWorld()->LineTraceSingleByChannel(OUT HitResult, StartLocation, EndLocation, ECollisionChannel::ECC_Camera))
 	{
 		HitLocation = HitResult.Location;
 		return true;
 	}
 
 	return false;
+}
+
+
+void ATankPlayerController::SetPawn(APawn* InPawn)
+{
+	Super::SetPawn(InPawn);
+
+	if (InPawn)
+	{
+		ATank* PossessedTank = Cast<ATank>(InPawn);
+
+		if (!ensure(PossessedTank)) { return; }
+
+		// TODO Subscribe our local method to the tank's death event
+		PossessedTank->OnDeath.AddUniqueDynamic(this, &ATankPlayerController::OnPossedTankDeath);
+	}
+}
+
+
+void ATankPlayerController::OnPossedTankDeath()
+{
+	StartSpectatingOnly();
 }

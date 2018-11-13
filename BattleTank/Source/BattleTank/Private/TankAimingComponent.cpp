@@ -4,6 +4,7 @@
 #include "TankBarrel.h"
 #include "TankTurret.h"
 #include "Bullet.h"
+#include "Tank.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values for this component's properties

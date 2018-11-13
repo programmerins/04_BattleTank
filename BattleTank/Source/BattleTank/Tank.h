@@ -7,6 +7,9 @@
 #include "Tank.generated.h"
 
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTankDelegate);
+
+
 UCLASS()
 class BATTLETANK_API ATank : public APawn
 {
@@ -17,15 +20,19 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Health")
 	float GetHealthPercent() const;
 
+	FTankDelegate OnDeath;
+
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Setup")
 	int32 StartingHealth = 100;
 
 	UPROPERTY(VisibleAnywhere, Category = "Health")
-	int32 CurrentHealth = StartingHealth;
+	int32 CurrentHealth; // Initialised in Begin Play
 
 private:
 	ATank();
+
+	virtual void BeginPlay() override;
 
 	// Called by the engine when actor damage is dealt
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;

@@ -32,12 +32,7 @@ private:
 
 	virtual void BeginPlay() override;
 
-	UFUNCTION() /// 언리얼 기능이므로 private에서도 해당 시그니처가 붙어야된다. (4-189)
-	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	TArray<class ASprungWheel*> GetWheels() const;
 
-	void ApplySidewayForce();
-
-	void DriveTrack();
-
-	float CurrentThrottle = 0.f;
+	void DriveTrack(float CurrentThrottle);
 };

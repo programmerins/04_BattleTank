@@ -1,6 +1,7 @@
 // Copyright EmbraceIT Ltd.
 #include "TankTrack.h"
-
+#include "SpawnPoint.h"
+#include "SprungWheel.h"
 
 UTankTrack::UTankTrack()
 {
@@ -11,50 +12,48 @@ UTankTrack::UTankTrack()
 void UTankTrack::BeginPlay()
 {
 	Super::BeginPlay();
-
-	OnComponentHit.AddDynamic(this, &UTankTrack::OnHit);
 }
 
 
-void UTankTrack::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+TArray<ASprungWheel*> UTankTrack::GetWheels() const
 {
-	DriveTrack();
-	ApplySidewayForce();
+	TArray<ASprungWheel*> ResultArray;
+	TArray<USceneComponent*> Children;
+
+	GetChildrenComponents(true, Children);
+
+	for (USceneComponent* Child : Children)
+	{
+		auto SpawnPointChild = Cast<USpawnPoint>(Child);
+		if (!SpawnPointChild) { continue; }
 	
-	CurrentThrottle = 0.f;
+		AActor* SpawnedChild = SpawnPointChild->GetSpawnedActor();
+		auto SprungWheel = Cast<ASprungWheel>(SpawnedChild);
+		if (!SprungWheel) { continue; }
+
+		ResultArray.Add(SprungWheel);
+	}
+
+	return ResultArray;
 }
 
 
 void UTankTrack::SetThrottle(float Throttle)
 {
-	CurrentThrottle = FMath::Clamp<float>(CurrentThrottle + Throttle, -1, 1);
+	float CurrentThrottle = FMath::Clamp<float>(Throttle, -1, 1);
+	DriveTrack(CurrentThrottle);
 }
 
 
-void UTankTrack::DriveTrack()
+void UTankTrack::DriveTrack(float CurrentThrottle)
 {
 	// TOOD clamp actual throttle value so player can't over-drive
-	FVector ForceApplied = GetForwardVector() * CurrentThrottle * TrackMaxDrivingForce;
-	FVector ForceLocation = GetComponentLocation();
-	auto TankRoot = Cast<UPrimitiveComponent>(GetOwner()->GetRootComponent());
+	auto Wheels = GetWheels();
+	float ForceApplied = CurrentThrottle * TrackMaxDrivingForce;
+	float ForcePerWheel = ForceApplied / Wheels.Num();
 
-	TankRoot->AddForceAtLocation(ForceApplied, ForceLocation);
+	for (ASprungWheel* Wheel : Wheels)
+	{
+		Wheel->AddDrivingForce(ForcePerWheel);
+	}
 }
-
-
-void UTankTrack::ApplySidewayForce()
-{
-	// Calculate the silppage speed
-	float SlippageSpeed = FVector::DotProduct(GetRightVector(), GetComponentVelocity());
-
-	// Work-out the required acceleration this frame to correct
-	float DeltaTime = GetWorld()->GetDeltaSeconds();
-	FVector CorrectionAcceleration = -SlippageSpeed / DeltaTime * GetRightVector();
-
-	// Calculate and apply sideways (F = m a)
-	UStaticMeshComponent* TankRoot = Cast<UStaticMeshComponent>(GetOwner()->GetRootComponent());
-	FVector CrrectionForce = (TankRoot->GetMass() * CorrectionAcceleration) / 2; /// Two tracks
-
-	TankRoot->AddForce(CrrectionForce);
-}
-

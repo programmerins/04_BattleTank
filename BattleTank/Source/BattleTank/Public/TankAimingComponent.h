@@ -38,10 +38,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Fire();
 
-	FORCEINLINE EFiringState GetFiringState() const { return FiringState; }
-
 	UFUNCTION(BlueprintCallable, Category = "Firing")
 	int32 GetRoundsLeft() const;
+	
+	FORCEINLINE EFiringState GetFiringState() const { return FiringState; }
 
 	void AimAt(FVector HitLocation);
 

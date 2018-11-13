@@ -40,10 +40,15 @@ private:
 	float LineTraceRange = 1000000.f;
 
 private:
+	UFUNCTION()
+	void OnPossedTankDeath();
+
+	virtual void SetPawn(APawn* InPawn) override;
+
 	// Start the tank moving the barrel so that a shot would it where
 	// the crosshair intersects the world
 	void AimTowardsCrosshair();
-
+	
 	// Return an OUT paramete, true if hit landscape
 	bool GetSightRayHitLocation(FVector& HitLocation) const;
 
